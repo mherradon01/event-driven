@@ -10,7 +10,6 @@ const userState = {
     uid:  "",
     email: "",
 
-    // Función para obtener el usuario actual
     isLogged() {
         return !!this.user;
     },
