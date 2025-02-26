@@ -10,7 +10,7 @@ const game = {
     DEFAULT_PATH: 'rooms/',
     path: 'rooms/',
     seed: '',
-    unsubscribe: null,
+    unsubscribeEvents: null,
     unsubscribeUsers: null,
     eventCallbacks: [],
     userCallbacks: [],
@@ -40,7 +40,6 @@ const game = {
             this.path = this.DEFAULT_PATH;
             return;
         }
-
         return room;
     },
 
@@ -69,7 +68,7 @@ const game = {
             seedData: this.seed,
         });
 
-        this.subscribe(Date.now());
+        this.subscribeEvents(Date.now());
         return roomCode;
     },
 
@@ -84,17 +83,28 @@ const game = {
                 timestamp: serverTimestamp() 
             }
         );
+        return date;
     },
 
     addEventCallback(callback) {
         this.eventCallbacks.push(callback);
     },
+    clearEventCallbacks() {
+        this.eventCallbacks = [];
+    },
     addUserCallback(callback) {
         this.userCallbacks.push(callback);
     },
-    subscribe(date) {
-        if (!this.unsubscribe) {
-            const millisdate = Timestamp.fromMillis(date);
+    clearUserCallbacks() {
+        this.userCallbacks = [];
+    },
+    subscribeEvents(date=null) {
+        if (!this.unsubscribeEvents) {
+            if (date !== null) {
+                const millisdate = Timestamp.fromMillis(date);
+            } else {
+                const millisdate = Timestamp.fromMillis(new Date(2020,1,1))
+            }
             console.log(millisdate)
             const q = query(
                 collection(getDB(), this.path + "/events"),
@@ -104,8 +114,7 @@ const game = {
                     where("timestamp", ">=", millisdate)
                 )
             );
-
-            this.unsubscribe = onSnapshot(q, (snapshot) => {
+            this.unsubscribeEvents = onSnapshot(q, (snapshot) => {
                 snapshot.docChanges().forEach((change) => {
                     for (let i = 0; i < this.eventCallbacks.length; i++) {
                         this.eventCallbacks[i](change.type, change.doc.data());
@@ -126,7 +135,7 @@ const game = {
         // extract data of all docs and make an array
         //const events = [];
         setTimeout(() => {
-            this.subscribe(Date.now());
+            this.subscribeEvents(Date.now());
         }, 1000);
         events.push(querySnapshot.docs.map(doc => doc.data()));
         return events;
@@ -151,13 +160,11 @@ const game = {
             });
         });
     },
-
     async logout() {
-        if (this.unsubscribe) {
-            this.unsubscribe()
-            this.unsubscribe = null
+        if (this.unsubscribeEvents) {
+            this.unsubscribeEvents()
+            this.unsubscribeEvents = null
         }
-
         if (this.unsubscribeUsers) {
             this.unsubscribeUsers()
             this.unsubscribeUsers = null

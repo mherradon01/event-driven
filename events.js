@@ -23,6 +23,7 @@ const events = {
     },
     logOut: () => {
         try {
+            game.logout()
             userState.logOut();
             return true;
         } catch (error) {
@@ -31,8 +32,8 @@ const events = {
         }
     },
 
-    // EVENTS FUNCTIONS
-    getSeed() {
+    // SEED FUNCTIONS
+    getSeed() { 
         try {
             return game.getSeed();
         } catch (error) {
@@ -40,12 +41,84 @@ const events = {
             return null;
         }
     },
+
+    // GAME FUNCTIONS
     createGame(seed) {
 
     },
     loadGame(seed) {
 
-    }
+    },
+
+    // EVENT FUNCTIONS
+    async addEvent(type, data) {
+        try {
+            return game.addEvent(type, data);
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+    async addEventCallback(callback) {
+        try {
+            game.addEventCallback(callback);
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+    async clearEventCallbacks() {
+        try {
+            game.clearEventCallbacks();
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+
+    // USER FUNCTIONS
+    async setUserData(user) {
+        try {
+            game.setUserData(user);
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+    async getUserData() {
+        try {
+            return game.getUserData();
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+    async suscribeUserData() {
+        try {
+            game.suscribeUserData();
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+    async addUserCallback(callback) {
+        try {
+            game.addUserCallback(callback);
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+    async clearUserCallbacks() {
+        try {
+            game.clearUserCallbacks();
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+
+
 }
 
 export default events;
