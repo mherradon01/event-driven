@@ -44,10 +44,20 @@ const events = {
 
     // GAME FUNCTIONS
     createGame(seed) {
-
+        try {
+            return game.createGame(seed);
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
     },
     loadGame(seed) {
-
+        try {
+            return game.loadGame(seed);
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
     },
 
     // EVENT FUNCTIONS
@@ -70,6 +80,22 @@ const events = {
     async clearEventCallbacks() {
         try {
             game.clearEventCallbacks();
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+    async suscribeEvents(date=null) {
+        try {
+            game.subscribeEvents(date);
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+    async getAllEvents() {
+        try {
+            return game.getAllEvents();
         } catch (error) {
             console.log(error);
             return null;
@@ -117,8 +143,6 @@ const events = {
             return null;
         }
     },
-
-
 }
 
 export default events;

@@ -130,15 +130,15 @@ const game = {
 
         const querySnapshot = await getDocs(q);
         const events = [];
-
         // const q = query(citiesRef, orderBy("state"), orderBy("population", "desc"));
         // extract data of all docs and make an array
         //const events = [];
-        setTimeout(() => {
+        /*setTimeout(() => {
             this.subscribeEvents(Date.now());
-        }, 1000);
+        }, 1000);*/
+        const date = Date.now();
         events.push(querySnapshot.docs.map(doc => doc.data()));
-        return events;
+        return {events: events, date: date};
     },
     async setUserData(data) {
         data.username = userState.displayName;
