@@ -2,7 +2,7 @@ import { setAuthCallback, logInWithGoogle, logOut } from '../firebase/fireinit.j
 
 const userState = {
     //user: null, // Aquí se almacena el usuario logeado
-    user: JSON.parse(localStorage.getItem('user')) || null,
+    user: null,//JSON.parse(localStorage.getItem('user')) || null,
     authInit: false, // Indica si la autenticación ya se inicializó
 
     displayName: "",
@@ -11,6 +11,12 @@ const userState = {
     email: "",
 
     isLogged() {
+        if (!this.authInit) {
+            this.initAuth();
+        }
+        if (this.user === null) {
+            return false;
+        }
         return !!this.user;
     },
 
@@ -25,9 +31,14 @@ const userState = {
             this.name = user.name;
             this.uid = user.uid;
             this.email = user.email;
-            localStorage.setItem('user', JSON.stringify(user));
+            // localStorage.setItem('user', JSON.stringify(user));
         } else {
-            localStorage.removeItem('user');
+            // localStorage.removeItem('user');
+            this.user = null;
+            this.displayName = "";
+            this.name = "";
+            this.uid = "";
+            this.email = "";
         }
     },
 
@@ -53,7 +64,9 @@ const userState = {
             return null;
         }
     },
-
+    addAuthCallback(callback) {
+        setAuthCallback(callback);
+    },
     initAuth() {
         if (!this.authInit) {
             this.authInit = true;

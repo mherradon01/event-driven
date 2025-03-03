@@ -10,17 +10,19 @@ import {
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  setPersistence,
+  browserLocalPersistence
 } from 'firebase/auth'
 
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore'
 
 import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 
-import { firebaseConfig } from '../firebase/config.js'
+import { firebaseConfig } from '../config.js'
 // copia en /services/config.js el fichero .json con la configuración de firebase
 // similar al ejemplo /services/config.js.example
 
-const useEmulator = true //false//import.meta.env.DEV || false
+const useEmulator = false//import.meta.env.DEV || false
 
 let app
 let auth

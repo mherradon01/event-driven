@@ -12,6 +12,22 @@ const events = {
             return null;
         }
     },
+    isLoggedIn: () => {
+        try {
+            return userState.isLogged();
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+    addAuthCallback: (callback) => {
+        try {
+            userState.addAuthCallback(callback);
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
     googleLogIn: async () => {
         try {
             const user = await userState.googleLogIn();
@@ -21,6 +37,15 @@ const events = {
             return null;
         }
     },
+    endgame: () => {
+        try {
+            game.logout();
+            return true;
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+    },
     logOut: () => {
         try {
             game.logout()
@@ -28,7 +53,7 @@ const events = {
             return true;
         } catch (error) {
             console.log(error);
-            return null;
+            return false;
         }
     },
 
@@ -43,9 +68,9 @@ const events = {
     },
 
     // GAME FUNCTIONS
-    createGame(seed) {
+    async createGame(seed) {
         try {
-            return game.createGame(seed);
+            return game.createGame(seed, userState.getUser().uid);
         } catch (error) {
             console.log(error);
             return null;
@@ -143,6 +168,11 @@ const events = {
             return null;
         }
     },
+    init() {
+        userState.initAuth();
+    }
 }
+
+
 
 export default events;

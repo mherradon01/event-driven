@@ -1,8 +1,6 @@
 import { subscribe } from 'firebase/data-connect';
 import { getCalls, getDB, logOut } from '../firebase/fireinit'
 import { FieldValue, Timestamp, addDoc, collection, doc, getDoc, getDocs, onSnapshot, orderBy, serverTimestamp, setDoc, query, QuerySnapshot, deleteDoc, where, or, Firestore} from "firebase/firestore";
-import { httpsCallable } from "firebase/functions";
-import { isThisTypeNode } from 'typescript';
 
 import userState from '../auth/user';
 
@@ -48,7 +46,6 @@ const game = {
         this.useruid = user;
         this.eventCallbacks = [];
         this.userCallbacks = [];
-        console.log("Creating game in: ", this.seed.noise)
 
         function generateRandomCode() {
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; // Letters only
@@ -100,10 +97,11 @@ const game = {
     },
     subscribeEvents(date=null) {
         if (!this.unsubscribeEvents) {
+            let millisdate
             if (date !== null) {
-                const millisdate = Timestamp.fromMillis(date);
+                millisdate = Timestamp.fromMillis(date);
             } else {
-                const millisdate = Timestamp.fromMillis(new Date(2020,1,1))
+                millisdate = Timestamp.fromMillis(new Date(2020,1,1))
             }
             console.log(millisdate)
             const q = query(
