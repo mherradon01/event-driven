@@ -14,10 +14,10 @@ const game = {
     userCallbacks: [],
     useruid: '',
     getSeed() {
-        console.log("Returning seed: ", this.seed.noise);
+        console.log("Returning seed: ", this.seed);
         return this.seed;
     },
-    async loadGame(user, room) {
+    async loadGame(room, user) {
         if (room == null || room == "") {
             alert("Please introduce a room code");
             throw new Error("Room code is empty");
@@ -76,6 +76,7 @@ const game = {
             { 
                 type: type,
                 data: data,
+                user: userState.uid,
                 localTimestamp: date, 
                 timestamp: serverTimestamp() 
             }
@@ -136,7 +137,7 @@ const game = {
         }, 1000);*/
         const date = Date.now();
         events.push(querySnapshot.docs.map(doc => doc.data()));
-        return {events: events, date: date};
+        return {events: events[0], date: date};
     },
     async setUserData(data) {
         data.username = userState.displayName;

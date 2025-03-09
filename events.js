@@ -76,9 +76,9 @@ const events = {
             return null;
         }
     },
-    loadGame(seed) {
+    loadGame(room) {
         try {
-            return game.loadGame(seed);
+            return game.loadGame(room, userState.getUser().uid);
         } catch (error) {
             console.log(error);
             return null;
