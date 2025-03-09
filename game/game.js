@@ -77,6 +77,7 @@ const game = {
                 type: type,
                 data: data,
                 user: userState.uid,
+                username: userState.displayName, // Add display name
                 localTimestamp: date, 
                 timestamp: serverTimestamp() 
             }
