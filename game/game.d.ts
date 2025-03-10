@@ -11,6 +11,8 @@ export interface Game {
     setUserData(data: any):any;
     getUserData():any;
     logout():any;
+    listRooms(user: string): any;
+    deleteRoom(roomId: string, user: string): any;
   }
   
   // Export the actual values the module provides

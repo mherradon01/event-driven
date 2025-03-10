@@ -1,6 +1,6 @@
 import { subscribe } from 'firebase/data-connect';
 import { getCalls, getDB, logOut } from '../firebase/fireinit'
-import { FieldValue, Timestamp, addDoc, collection, doc, getDoc, getDocs, onSnapshot, orderBy, serverTimestamp, setDoc, query, QuerySnapshot, deleteDoc, where, or, Firestore} from "firebase/firestore";
+import { FieldValue, Timestamp, addDoc, collection, doc, getDoc, getDocs, onSnapshot, orderBy, serverTimestamp, setDoc, query, QuerySnapshot, deleteDoc, where, or, Firestore } from "firebase/firestore";
 
 import userState from '../auth/user';
 
@@ -56,13 +56,13 @@ const game = {
             return code;
         }
         let roomCode = generateRandomCode();
-        this.path = this.DEFAULT_PATH + roomCode//room.data;
-        // Set the document with the seed and an empty events array
-        // delete doc first
+        this.path = this.DEFAULT_PATH + roomCode;
         const docRef = doc(getDB(), this.path);
 
         await setDoc(docRef, {
             seedData: this.seed,
+            owner: user,
+            createdAt: serverTimestamp() // Store the timestamp
         });
 
         this.subscribeEvents(Date.now());
@@ -73,13 +73,13 @@ const game = {
         const date = Date.now();
         const docRef = await addDoc(
             collection(getDB(), this.path, 'events'),
-            { 
+            {
                 type: type,
                 data: data,
                 user: userState.uid,
                 username: userState.displayName, // Add display name
-                localTimestamp: date, 
-                timestamp: serverTimestamp() 
+                localTimestamp: date,
+                timestamp: serverTimestamp()
             }
         );
         return date;
@@ -97,19 +97,19 @@ const game = {
     clearUserCallbacks() {
         this.userCallbacks = [];
     },
-    subscribeEvents(date=null) {
+    subscribeEvents(date = null) {
         if (!this.unsubscribeEvents) {
             let millisdate
             if (date !== null) {
                 millisdate = Timestamp.fromMillis(date);
             } else {
-                millisdate = Timestamp.fromMillis(new Date(2020,1,1))
+                millisdate = Timestamp.fromMillis(new Date(2020, 1, 1))
             }
             console.log(millisdate)
             const q = query(
                 collection(getDB(), this.path + "/events"),
                 orderBy('timestamp', 'asc'),
-                or( 
+                or(
                     where("localTimestamp", ">=", date),
                     where("timestamp", ">=", millisdate)
                 )
@@ -138,7 +138,7 @@ const game = {
         }, 1000);*/
         const date = Date.now();
         events.push(querySnapshot.docs.map(doc => doc.data()));
-        return {events: events[0], date: date};
+        return { events: events[0], date: date };
     },
     async setUserData(data) {
         data.username = userState.displayName;
@@ -168,6 +168,28 @@ const game = {
         if (this.unsubscribeUsers) {
             this.unsubscribeUsers()
             this.unsubscribeUsers = null
+        }
+    },
+
+    async listRooms(user) {
+        const q = query(collection(getDB(), this.DEFAULT_PATH), where("owner", "==", user));
+        const querySnapshot = await getDocs(q);
+        const rooms = [];
+        querySnapshot.forEach((doc) => {
+            rooms.push({ id: doc.id, ...doc.data() });
+        });
+        return rooms;
+    },
+
+    async deleteRoom(roomId, user) {
+        const roomRef = doc(getDB(), this.DEFAULT_PATH, roomId);
+        const roomDoc = await getDoc(roomRef);
+
+        if (roomDoc.exists() && roomDoc.data().owner === user) {
+            await deleteDoc(roomRef);
+            return true;
+        } else {
+            throw new Error("Unauthorized or room does not exist");
         }
     }
 }

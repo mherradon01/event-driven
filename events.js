@@ -85,6 +85,24 @@ const events = {
         }
     },
 
+    // ROOM FUNCTIONS
+    async listRooms() {
+        try {
+            return game.listRooms(userState.getUser().uid);
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+    async deleteRoom(roomId) {
+        try {
+            return game.deleteRoom(roomId, userState.getUser().uid);
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
+
     // EVENT FUNCTIONS
     async addEvent(type, data) {
         try {
@@ -172,7 +190,5 @@ const events = {
         userState.initAuth();
     }
 }
-
-
 
 export default events;
