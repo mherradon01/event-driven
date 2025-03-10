@@ -105,7 +105,7 @@ const game = {
             } else {
                 millisdate = Timestamp.fromMillis(new Date(2020, 1, 1))
             }
-            console.log(millisdate)
+
             const q = query(
                 collection(getDB(), this.path + "/events"),
                 orderBy('timestamp', 'asc'),
