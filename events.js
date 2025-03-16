@@ -94,6 +94,15 @@ const events = {
             return null;
         }
     },
+    async myRooms() {
+        try {
+            return game.myRooms(userState.getUser().uid);
+        }
+        catch (error) {
+            console.log(error);
+            return null;
+        }
+    },
     async deleteRoom(roomId) {
         try {
             return game.deleteRoom(roomId, userState.getUser().uid);

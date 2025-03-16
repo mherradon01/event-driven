@@ -1,6 +1,6 @@
 import { subscribe } from 'firebase/data-connect';
 import { getCalls, getDB, logOut } from '../firebase/fireinit'
-import { FieldValue, Timestamp, addDoc, collection, doc, getDoc, getDocs, onSnapshot, orderBy, serverTimestamp, setDoc, query, QuerySnapshot, deleteDoc, where, or, Firestore } from "firebase/firestore";
+import { arrayUnion, Timestamp, addDoc, collection, doc, getDoc, getDocs, onSnapshot, orderBy, serverTimestamp, setDoc, query, QuerySnapshot, deleteDoc, where, or, Firestore } from "firebase/firestore";
 
 import userState from '../auth/user';
 
@@ -32,6 +32,12 @@ const game = {
         if (docSnap.exists()) {
             this.seed = docSnap.data().seedData;
             console.log("Document data:", docSnap.data());
+
+            // Add user to the room guests array
+            await setDoc(docRef, {
+                guests: arrayUnion(user)
+            }, { merge: true });
+
         } else {
             // docSnap.data() will be undefined in this case
             alert("No such room or unauthorized access!");
@@ -62,6 +68,7 @@ const game = {
         await setDoc(docRef, {
             seedData: this.seed,
             owner: user,
+            guests: [user],
             createdAt: serverTimestamp() // Store the timestamp
         });
 
@@ -171,7 +178,7 @@ const game = {
         }
     },
 
-    async listRooms(user) {
+    async myRooms(user) {
         const q = query(collection(getDB(), this.DEFAULT_PATH), where("owner", "==", user));
         const querySnapshot = await getDocs(q);
         const rooms = [];
@@ -181,6 +188,15 @@ const game = {
         return rooms;
     },
 
+    async listRooms(user) {
+        const q = query(collection(getDB(), this.DEFAULT_PATH), where("guests", "array-contains", user));
+        const querySnapshot = await getDocs(q);
+        const rooms = [];
+        querySnapshot.forEach((doc) => {
+            rooms.push({ id: doc.id, ...doc.data() });
+        });
+        return rooms;
+    },
     async deleteRoom(roomId, user) {
         const roomRef = doc(getDB(), this.DEFAULT_PATH, roomId);
         const roomDoc = await getDoc(roomRef);
