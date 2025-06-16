@@ -1,0 +1,33 @@
+rules_version = '2';
+
+service cloud.firestore {
+  function isUpdateToOpenField(field) {
+    return request.resource.data.diff(resource.data).affectedKeys().hasOnly(field);
+  }
+  match /databases/{database}/documents {
+    match /rooms/{roomId} {
+      allow read: if  request.auth != null; // global read access
+      allow create: if request.auth != null &&
+      !exists(/databases/$(database)/documents/rooms/$(roomId)) &&
+      request.resource.data.owner == request.auth.uid; // allow create room
+      //allow update: if (!request.resource.data.diff(resource.data).affectedKeys()
+      //  .hasAny(['guests']));
+      allow update: if request.auth != null && request.resource.data.guests.size() == resource.data.guests.size() + 1
+          && request.resource.data.guests.hasAll(resource.data.guests) && isUpdateToOpenField(['guests']);
+      allow delete: if request.auth != null && request.auth.uid == resource.data.owner; // allow delete room
+      allow write: if false;
+    }
+    match /rooms/{roomId}/events/{eventId} {
+      allow read: if request.auth != null ; // global read access
+      allow create: if request.auth != null &&
+      request.resource.data.owner == request.auth.uid && request.resource.data.roomId == roomId; // allow create event
+      allow write: if false;
+    }
+    match /rooms/{roomId}/users/{userId} {
+      allow read: if request.auth != null ; // global read access
+      allow create: if request.auth != null &&
+      request.resource.data.useruid == request.auth.uid && request.auth.uid == userId; // allow create user
+      allow write: if userId == request.auth.uid;
+    }
+  }
+}
